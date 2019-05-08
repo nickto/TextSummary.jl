@@ -1,0 +1,4 @@
+name = "text-summary"
+uuid = "42f9d1cc-7196-11e9-2b71-cb133a1f9bd1"
+authors = ["Nick To <nickto0x64@gmail.com>"]
+version = "0.0.9000"
