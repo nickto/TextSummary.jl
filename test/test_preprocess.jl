@@ -1,3 +1,4 @@
+using Test
 include("../src/Preprocess.jl")
 using .Preprocess
 

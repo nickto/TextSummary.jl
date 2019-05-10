@@ -3,7 +3,7 @@ using TextAnalysis
 using WordTokenizers
 using Languages
 
-export remove_utf_punctuation, remove_utf_punctuation!, preprocess
+export preprocess
 
 "Remove all symbols identified as Unicode general category Punctuation."
 function remove_utf_punctuation(str::String)
@@ -21,24 +21,29 @@ function remove_utf_punctuation(str::StringDocument)
     remove_utf_punctuation(str.text)
 end
 
+"Infer the language of a StringDocument."
+function detect_language(sd::StringDocument, confidence_threshold::AbstractFloat=0.9)
+    detector = LanguageDetector()
+    lang, script, confidence = detector(sd.text)
+    if confidence < confidence_threshold
+        @warn "Could not infer language with reasonable confidence ($confidence)."
+    end
+    return lang, script, confidence
+end
+
+"Infer and set the language of a StringDocument."
+function set_language!(sd::StringDocument, confidence_threshold::AbstractFloat=0.9)
+    lang, _, _ = detect_language(sd, confidence_threshold)
+    language!(sd, lang)
+    lang
+end
+
 function preprocess(str::String)
     sd = StringDocument(str)
     prepare!(sd, strip_corrupt_utf8)
     prepare!(sd, strip_html_tags)
 
-    # Detect language
-    detector = LanguageDetector()
-    lang, _, confidence = detector(sd.text)
-    if confidence < 0.9
-        @warn "Could not infer language with reasonable confidence ($confidence)."
-    end
-    language!(sd, lang)
-
-    # Keep only line breaks between paragraphs
-    # replace!(sd.text, r"\r\n(?!\r\n)"=>"")
-    sd.text = replace(sd.text, r"\r\n\r\n"=>"\n")
-    sd.text = replace(sd.text, r"\r\n"=>" ")
-    sd.text = replace(sd.text, r"\n\n"=>"\n")
+    lang = set_language!(sd)
 
     # Split into sentences
     sentences = split_sentences(text(sd))
