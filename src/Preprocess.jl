@@ -3,7 +3,12 @@ using TextAnalysis
 using WordTokenizers
 using Languages
 
-export preprocess
+export preprocess, ProcessedSentence
+
+struct ProcessedSentence
+    original::String
+    processed::StringDocument
+end
 
 "Remove all symbols identified as Unicode general category Punctuation."
 function remove_utf_punctuation(str::String)
@@ -55,19 +60,15 @@ Preprocess a string:
 11. Strip whitespace
 12. Stem
 
-Returns and array of Dicts with 2 fiels:
-- "original": original sentence as String.
-- "processed": preprocessed sentence as StringDocument.
-
 # Examples
 ```julia-repl
-julia> preprocess("First sentence. Second sentence.")
-2-element Array{Dict{String,Any},1}:
-Dict("original"=>"First sentence.","processed"=>StringDocument{String}("first sentenc", DocumentMetadata(French(), "Untitled Document", "Unknown Author", "Unknown Time")))
-Dict("original"=>"Second sentence.","processed"=>StringDocument{String}("second sentenc", DocumentMetadata(French(), "Untitled Document", "Unknown Author", "Unknown Time")))
+julia> preprocess("This is the first sentence. Second sentence.")
+2-element Array{ProcessedSentence,1}:
+ ProcessedSentence("This is the first sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
+ ProcessedSentence("Second sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
 ```
 """
-function preprocess(str::String)::Array{Dict{String,Any},1}
+function preprocess(str::String)::Array{ProcessedSentence,1}
     sd = StringDocument(str)
     prepare!(sd, strip_corrupt_utf8)
     prepare!(sd, strip_html_tags)
@@ -82,32 +83,31 @@ function preprocess(str::String)::Array{Dict{String,Any},1}
 
     # Convert each sentence to StringDocument, but also keep the original
     sentences = [
-        Dict{String, Any}(
-            "original" => String(sentence),
-            "processed" => StringDocument(String(sentence))
-        )
-        for sentence in sentences
+        ProcessedSentence(
+            String(sentence),
+            StringDocument(String(sentence))
+        ) for sentence in sentences
     ]
 
     # Preprocess
     for sentence in sentences
-        language!(sentence["processed"], lang)
+        language!(sentence.processed, lang)
         # Remove ё from russian
         if lang == Languages.Russian()
-            sentence["processed"].text = replace(sentence["processed"].text, "ё" => "е")
+            sentence.processed.text = replace(sentence.processed.text, "ё" => "е")
         end
 
-        remove_case!(sentence["processed"])
-        prepare!(sentence["processed"], strip_numbers)
-        prepare!(sentence["processed"], strip_punctuation)
+        remove_case!(sentence.processed)
+        prepare!(sentence.processed, strip_numbers)
+        prepare!(sentence.processed, strip_punctuation)
 
         # Above function removes only a small subset of punctuation
-        remove_utf_punctuation!(sentence["processed"])
-        prepare!(sentence["processed"], strip_stopwords)
-        prepare!(sentence["processed"], strip_pronouns)
-        prepare!(sentence["processed"], strip_frequent_terms)
-        prepare!(sentence["processed"], strip_whitespace)
-        prepare!(sentence["processed"], stem_words)
+        remove_utf_punctuation!(sentence.processed)
+        prepare!(sentence.processed, strip_stopwords)
+        prepare!(sentence.processed, strip_pronouns)
+        prepare!(sentence.processed, strip_frequent_terms)
+        prepare!(sentence.processed, strip_whitespace)
+        prepare!(sentence.processed, stem_words)
     end
 
     return sentences
