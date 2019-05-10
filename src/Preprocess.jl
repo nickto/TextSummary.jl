@@ -38,7 +38,36 @@ function set_language!(sd::StringDocument, confidence_threshold::AbstractFloat=0
     lang
 end
 
-function preprocess(str::String)
+"""
+    preprocess(str)
+
+Preprocess a string:
+1. Strip HTML tags
+2. Strip Corrupt UTF characters
+3. Infer language
+4. Split into sentences
+5. Lowercase
+6. Remove numbers
+7. Remove punctuation
+8. Remove stopwords
+9. Remove pronouns
+10. Remove frequent terms
+11. Strip whitespace
+12. Stem
+
+Returns and array of Dicts with 2 fiels:
+- "original": original sentence as String.
+- "processed": preprocessed sentence as StringDocument.
+
+# Examples
+```julia-repl
+julia> preprocess("First sentence. Second sentence.")
+2-element Array{Dict{String,Any},1}:
+Dict("original"=>"First sentence.","processed"=>StringDocument{String}("first sentenc", DocumentMetadata(French(), "Untitled Document", "Unknown Author", "Unknown Time")))
+Dict("original"=>"Second sentence.","processed"=>StringDocument{String}("second sentenc", DocumentMetadata(French(), "Untitled Document", "Unknown Author", "Unknown Time")))
+```
+"""
+function preprocess(str::String)::Array{Dict{String,Any},1}
     sd = StringDocument(str)
     prepare!(sd, strip_corrupt_utf8)
     prepare!(sd, strip_html_tags)
