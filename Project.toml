@@ -1,4 +1,11 @@
-name = "text-summary"
+name = "TextSummary"
 uuid = "42f9d1cc-7196-11e9-2b71-cb133a1f9bd1"
 authors = ["Nick To <nickto0x64@gmail.com>"]
 version = "0.0.9000"
+
+[deps]
+Languages = "8ef0a80b-9436-5d2c-a485-80b904378c43"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TextAnalysis = "a2db99b7-8b79-58f8-94bf-bbc811eef33d"
+WordTokenizers = "796a5d58-b03d-544a-977e-18100b691f6e"
