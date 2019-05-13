@@ -1,6 +1,5 @@
 using Test
 using TextSummary
-using TextSummary: SumBasic
 
 str = """
 Julia is a high-level general-purpose[14] dynamic programming language designed for high-performance numerical analysis and computational science.[15][16][17][18] It is also useful for low-level systems programming,[19] as a specification language,[20] with work being done on client[21] and server web use.[22]
@@ -8,12 +7,9 @@ Distinctive aspects of Julia's design include a type system with parametric poly
 Julia is garbage-collected,[24] uses eager evaluation, and includes efficient libraries for floating-point calculations, linear algebra, random number generation, and regular expression matching. Many libraries are available, including some (e.g., for fast Fourier transforms) that were previously bundled with Julia and are now separate.[25]
 Tools available for Julia include IDEs; with integrated tools, e.g. a linter,[26] debugger,[27] and the Rebugger.jl package "supports repeated-execution debugging"[a] and more.[29]
 """
+sentences = preprocess(str)
 
-@testset "Non-zero weights" begin
-    sentences = preprocess(str)
-
-    # TF-IDF
-    @test all([s.weight > 0.0 for s in sumbasic_weights!(sentences, true)])
-    # Plain frequencies
-    @test all([s.weight > 0.0 for s in sumbasic_weights!(sentences, false)])
+@testset "Summary length" begin
+    @test length(summarize(sumbasic_weights!(sentences), 1)) == 1
+    @test length(summarize(sumbasic_weights!(sentences), 5)) == 5
 end

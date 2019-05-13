@@ -2,10 +2,10 @@ module SumBasic
 using TextAnalysis
 import ..Sentence
 
-export weight_sentences!
+export sumbasic_weights!
 
 "Compute weights of each sentence, using SumBasic algorithm."
-function weight_sentences!(sentences::Array{Sentence,1}, tfidf::Bool=true)
+function sumbasic_weights!(sentences::Array{Sentence,1}, tfidf::Bool=true)
     crps = Corpus([s.processed for s in sentences])
     update_lexicon!(crps)
     m = DocumentTermMatrix(crps)
