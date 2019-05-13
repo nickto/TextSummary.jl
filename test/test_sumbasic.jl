@@ -1,6 +1,6 @@
 using Test
 using TextSummary
-using TextSummary: SumBasic
+using TextSummary.SumBasic
 
 str = """
 Julia is a high-level general-purpose[14] dynamic programming language designed for high-performance numerical analysis and computational science.[15][16][17][18] It is also useful for low-level systems programming,[19] as a specification language,[20] with work being done on client[21] and server web use.[22]
@@ -9,11 +9,24 @@ Julia is garbage-collected,[24] uses eager evaluation, and includes efficient li
 Tools available for Julia include IDEs; with integrated tools, e.g. a linter,[26] debugger,[27] and the Rebugger.jl package "supports repeated-execution debugging"[a] and more.[29]
 """
 
+
 @testset "Non-zero weights" begin
     sentences = preprocess(str)
 
-    # TF-IDF
-    @test all([s.weight > 0.0 for s in sumbasic_weights!(sentences, true)])
-    # Plain frequencies
-    @test all([s.weight > 0.0 for s in sumbasic_weights!(sentences, false)])
+    @test all([s.weight > 0.0 for s in score(sentences, true)])
+    @test all([s.weight > 0.0 for s in score(sentences, false)])
+end
+
+@testset "Side effects" begin
+    sentences = preprocess(str)
+
+    # Not in-place version should not affect the passes parameter
+    scored_sentences = score(sentences, true)
+    @test scored_sentences != sentences
+
+    scored_sentences_inplace = score!(sentences, true)
+    # Inplace version should return nothing
+    @test scored_sentences_inplace == nothing
+    # Sentences modified in-place should be the same as not in-place
+    @test scored_sentences == sentences
 end

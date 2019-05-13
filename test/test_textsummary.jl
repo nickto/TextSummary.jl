@@ -10,6 +10,20 @@ Tools available for Julia include IDEs; with integrated tools, e.g. a linter,[26
 sentences = preprocess(str)
 
 @testset "Summary length" begin
-    @test length(summarize(sumbasic_weights!(sentences), 1)) == 1
-    @test length(summarize(sumbasic_weights!(sentences), 5)) == 5
+    @test length(summarize(sentences, 1, SumBasic.score)) == 1
+    @test length(summarize(sentences, 5, SumBasic.score)) == 5
+end
+
+@testset "Sentence equality" begin
+    a = preprocess(str)[1]
+    b = deepcopy(preprocess(str))[1]
+    @test a == b
+
+    a = preprocess(str)
+    b = deepcopy(preprocess(str))
+    @test a == b
+
+    a = preprocess(str)
+    b =preprocess("_" * str)
+    @test a != b
 end
