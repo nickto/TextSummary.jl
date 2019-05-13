@@ -1,14 +1,10 @@
 module Preprocess
+import ..Sentence
 using TextAnalysis
 using WordTokenizers
 using Languages
 
-export preprocess, ProcessedSentence
-
-struct ProcessedSentence
-    original::String
-    processed::StringDocument
-end
+export preprocess
 
 "Remove all symbols identified as Unicode general category Punctuation."
 function remove_utf_punctuation(str::String)
@@ -31,7 +27,7 @@ function detect_language(sd::StringDocument, confidence_threshold::AbstractFloat
     detector = LanguageDetector()
     lang, script, confidence = detector(sd.text)
     if confidence < confidence_threshold
-        @warn "Could not infer language with reasonable confidence ($confidence)."
+        @warn "Could not infer language with reasonable confidence ($(repr(lang)), $confidence)."
     end
     return lang, script, confidence
 end
@@ -41,6 +37,27 @@ function set_language!(sd::StringDocument, confidence_threshold::AbstractFloat=0
     lang, _, _ = detect_language(sd, confidence_threshold)
     language!(sd, lang)
     lang
+end
+
+"Preprocess a single sentence."
+function preprocess_sentence!(sd::StringDocument, lang::Language)
+    language!(sd, lang)
+    # Remove ё from russian
+    if sd.metadata.language == Languages.Russian()
+        sd.text = replace(sd.text, "ё" => "е")
+    end
+
+    remove_case!(sd)
+    prepare!(sd, strip_numbers)
+    prepare!(sd, strip_punctuation)
+
+    # Above function removes only a small subset of punctuation
+    remove_utf_punctuation!(sd)
+    # prepare!(sd, strip_stopwords)
+    # prepare!(sd, strip_pronouns)
+    # prepare!(sd, strip_frequent_terms)
+    # prepare!(sd, strip_whitespace)
+    # prepare!(sd, stem_words)
 end
 
 """
@@ -63,12 +80,12 @@ Preprocess a string:
 # Examples
 ```julia-repl
 julia> preprocess("This is the first sentence. Second sentence.")
-2-element Array{ProcessedSentence,1}:
- ProcessedSentence("This is the first sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
- ProcessedSentence("Second sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
+2-element Array{Sentence,1}:
+ Sentence("This is the first sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
+ Sentence("Second sentence.", TextAnalysis.StringDocument{String}("sentenc", TextAnalysis.DocumentMetadata(Languages.English(), "Untitled Document", "Unknown Author", "Unknown Time")))
 ```
 """
-function preprocess(str::String)::Array{ProcessedSentence,1}
+function preprocess(str::String)::Array{Sentence,1}
     sd = StringDocument(str)
     prepare!(sd, strip_corrupt_utf8)
     prepare!(sd, strip_html_tags)
@@ -83,7 +100,8 @@ function preprocess(str::String)::Array{ProcessedSentence,1}
 
     # Convert each sentence to StringDocument, but also keep the original
     sentences = [
-        ProcessedSentence(
+        Sentence(
+            0.0,
             String(sentence),
             StringDocument(String(sentence))
         ) for sentence in sentences
@@ -91,25 +109,8 @@ function preprocess(str::String)::Array{ProcessedSentence,1}
 
     # Preprocess
     for sentence in sentences
-        language!(sentence.processed, lang)
-        # Remove ё from russian
-        if lang == Languages.Russian()
-            sentence.processed.text = replace(sentence.processed.text, "ё" => "е")
-        end
-
-        remove_case!(sentence.processed)
-        prepare!(sentence.processed, strip_numbers)
-        prepare!(sentence.processed, strip_punctuation)
-
-        # Above function removes only a small subset of punctuation
-        remove_utf_punctuation!(sentence.processed)
-        prepare!(sentence.processed, strip_stopwords)
-        prepare!(sentence.processed, strip_pronouns)
-        prepare!(sentence.processed, strip_frequent_terms)
-        prepare!(sentence.processed, strip_whitespace)
-        prepare!(sentence.processed, stem_words)
+        preprocess_sentence!(sentence.processed, lang)
     end
-
     return sentences
 end
 

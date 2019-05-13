@@ -1,13 +1,16 @@
 module TextSummary
-    include("BasicSum.jl")
-    include("Preprocess.jl")
-    using .BasicSum
-    using .Preprocess
+include("SumBasic.jl")
+include("Preprocess.jl")
+using .SumBasic
+using .Preprocess
 
-    export greet, preprocess
+export preprocess, Sentence
 
-
-
+struct Sentence
+    weight::AbstractFloat
+    original::String
+    processed::Preprocess.StringDocument
+end
 
 
 end

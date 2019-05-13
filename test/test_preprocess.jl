@@ -1,9 +1,13 @@
 using Test
-include("../src/Preprocess.jl")
-using .Preprocess
+using TextSummary: Preprocess
 
-str = "First sentence. Second sentence."
-@test length(preprocess(str)) == 2
+@testset "Sentence splitting" begin
+    str = "This is a sentence about the famous writer A. A. Adamson."
+    @test length(preprocess(str)) == 1
 
-str = "First sentence. Second sentence about USA. And a third sentence."
-@test length(preprocess(str)) == 3
+    str = "This is the first sentence. Second sentence."
+    @test length(preprocess(str)) == 2
+
+    str = "This is the first sentence. Second sentence about EU. And a third sentence."
+    @test length(preprocess(str)) == 3
+end
