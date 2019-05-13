@@ -1,15 +1,14 @@
 module TextSummary
+include("types.jl")
 include("SumBasic.jl")
 include("Preprocess.jl")
 using .SumBasic
 using .Preprocess
 
-export preprocess, Sentence
+export preprocess, Sentence, weight_sentences!, summarize
 
-struct Sentence
-    weight::AbstractFloat
-    original::String
-    processed::Preprocess.StringDocument
+function summarize(Array{Sentence, 1})
+
 end
 
 
