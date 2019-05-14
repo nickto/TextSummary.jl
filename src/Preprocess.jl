@@ -53,11 +53,11 @@ function preprocess_sentence!(sd::StringDocument, lang::Language)
 
     # Above function removes only a small subset of punctuation
     remove_utf_punctuation!(sd)
-    # prepare!(sd, strip_stopwords)
-    # prepare!(sd, strip_pronouns)
-    # prepare!(sd, strip_frequent_terms)
-    # prepare!(sd, strip_whitespace)
-    # prepare!(sd, stem_words)
+    prepare!(sd, strip_stopwords)
+    prepare!(sd, strip_pronouns)
+    prepare!(sd, strip_frequent_terms)
+    prepare!(sd, strip_whitespace)
+    prepare!(sd, stem_words)
 end
 
 """
@@ -102,7 +102,7 @@ function preprocess(str::String)::Array{Sentence,1}
     sentences = [
         Sentence(
             0.0,
-            String(sentence),
+            strip(String(sentence)),
             StringDocument(String(sentence))
         ) for sentence in sentences
     ]
