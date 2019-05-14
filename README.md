@@ -20,6 +20,7 @@ summary = summarize(sentences=preprocess(text), k=5, scorer=SumBasic.score)
 ```
 
 ## TODO
+
 [x] ~~Check why TF-IDF does not work and whether there is way to make it work.~~ Does not make sense for summarization o a single document.
 [ ] Normalize frequency by the sentence length
 [ ] If you just sum frequencies, it looks only at a single sentence which is obviously wrong.
