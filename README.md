@@ -16,7 +16,7 @@ But it does not matter because it is eventually split into sentences.
 Just make sure that there are no line separators within a sentence.
 """
 
-summary = summarize(sentences=preprocess(text), k=5, scorer=SumBasic.score)
+summary = SumBasic.summarize(sentences=preprocess(text), k=5)
 ```
 
 ## TODO
