@@ -24,7 +24,7 @@ summary = summarize(sentences=preprocess(text), k=5, scorer=SumBasic.score)
 - [X] ~~Check why TF-IDF does not work and whether there is way to make it work:~~ Does not make sense for summarization of a single document.
 - [X] Normalize frequency by the sentence length
 - [X] If you just sum frequencies, it looks only at a single sentence which is obviously wrong.
-- [ ] Actual SumBasic greedy approach to sentence selection is a little different, implement it.
+- [X] Actual SumBasic greedy approach to sentence selection is a little different, implement it.
 - [ ] Implement TextRank.
 - [ ] Implement cluster-based summarisation.
 - [ ] Implement LDA-based summarisation.
