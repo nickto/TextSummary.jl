@@ -5,13 +5,8 @@ include("Preprocess.jl")
 import .SumBasic
 using .Preprocess
 
-export preprocess, Sentence, summarize
+export preprocess
+export Sentence
 export SumBasic
-
-function summarize(sentences::Array{Sentence, 1}, k, scorer::Function=SumBasic.score)
-    sorted = sort(scorer(sentences), by=s -> s.weight, rev=true)
-    return [s.original for s in sorted[1:min(length(sorted), k)]]
-end
-
 
 end

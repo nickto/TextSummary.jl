@@ -1,13 +1,13 @@
 using TextAnalysis: StringDocument
 
 mutable struct Sentence
-    weight::AbstractFloat
+    score::AbstractFloat
     original::String
     processed::StringDocument
 end
 
 Base.:(==)(a::Sentence, b::Sentence) = (
-    (a.weight == b.weight) &
+    (a.score == b.score) &
     (a.original == b.original) &
     (
         (a.processed.text == b.processed.text) &

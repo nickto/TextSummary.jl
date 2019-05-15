@@ -11,8 +11,8 @@ using TextSummary
     sentences = preprocess(str)
 
     @testset "Summary length" begin
-        @test length(summarize(sentences, 1, SumBasic.score)) == 1
-        @test length(summarize(sentences, 5, SumBasic.score)) == 5
+        @test length(SumBasic.summarize(sentences, 1)) == 1
+        @test length(SumBasic.summarize(sentences, 5)) == 5
     end
 
     @testset "Sentence equality" begin
@@ -25,7 +25,7 @@ using TextSummary
         @test a == b
 
         a = preprocess(str)
-        b =preprocess("_" * str)
+        b = preprocess("_" * str)
         @test a != b
     end
 
@@ -38,8 +38,7 @@ using TextSummary
         s = replace(s, r"\r\n" => " ")
         # It appears that summarizer does not deal with mutiple spaces well
         s = replace(s, r"(\s){2,}" => " ")
-        summary = summarize(preprocess(s), 5, SumBasic.score)
+        summary = SumBasic.summarize(preprocess(s), 5)
         @test typeof(summary) <: AbstractArray
-
     end
 end
